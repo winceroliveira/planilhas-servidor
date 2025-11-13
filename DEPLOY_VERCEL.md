@@ -52,35 +52,59 @@ git push
 5. **Configure Variáveis de Ambiente:**
    Clique em "Environment Variables" e adicione (uma por vez):
    
-   **Variável 1:**
+   **Variável 1: SECRET_KEY**
    - **Name:** `SECRET_KEY`
-   - **Value:** (gere uma nova chave - veja abaixo)
-   - **Environment:** Production, Preview, Development (marque todos)
+   - **Value:** (veja opções abaixo para gerar)
+   - **Environment:** ☑ Production ☑ Preview ☑ Development
    
-   **Variável 2:**
+   **O que é SECRET_KEY?**
+   É uma chave secreta usada pelo Django para criptografia, sessões e segurança. **NÃO compartilhe esta chave publicamente!**
+   
+   **Como gerar (escolha uma opção):**
+   
+   **Opção 1 - Python com Django (se tiver Django instalado):**
+   ```bash
+   cd servidor
+   python manage.py shell -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+   ```
+   
+   **Opção 2 - Python puro (sem Django):**
+   ```bash
+   python -c "import secrets; print('django-insecure-' + secrets.token_urlsafe(50))"
+   ```
+   
+   **Opção 3 - Gere online (mais fácil):**
+   1. Acesse: https://djecrety.ir/
+   2. Clique em "Generate"
+   3. Copie a chave gerada
+   
+   **Opção 4 - Use esta chave (temporária, substitua depois):**
+   ```
+   django-insecure-dl(^_$950k(_b-ph&@zn^h1o(69wy=ahm@338!#rt62qx0qqhh
+   ```
+   
+   ⚠️ **IMPORTANTE:** Use uma chave diferente para produção! A chave acima é apenas para desenvolvimento.
+   
+   **Variável 2: DEBUG**
    - **Name:** `DEBUG`
    - **Value:** `False`
-   - **Environment:** Production, Preview, Development
+   - **Environment:** ☑ Production ☑ Preview ☑ Development
    
-   **Variável 3:**
+   **Variável 3: ALLOWED_HOSTS**
    - **Name:** `ALLOWED_HOSTS`
-   - **Value:** `seu-projeto.vercel.app` (será preenchido após o primeiro deploy)
-   - **Environment:** Production, Preview, Development
+   - **Value:** (deixe vazio por enquanto, será preenchido após o primeiro deploy)
+   - **Environment:** ☑ Production ☑ Preview ☑ Development
    
-   **Variável 4:**
+   **Após o primeiro deploy**, volte aqui e atualize com:
+   ```
+   seu-projeto.vercel.app
+   ```
+   (substitua `seu-projeto` pelo nome real do seu projeto na Vercel)
+   
+   **Variável 4: MANUS_AI_API_KEY**
    - **Name:** `MANUS_AI_API_KEY`
    - **Value:** `sk-6mrwm3G-9Y5Fbsguirsnbom066uPeJ4JX4aYGGVxc4IN9DdQ8uXRsBuCyjJfSxedvM_Nak3K3u310yOfstgBKcrDkDAf`
-   - **Environment:** Production, Preview, Development
-   
-   **Para gerar uma nova SECRET_KEY:**
-   ```bash
-   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-   ```
-   
-   **OU use este valor temporário (substitua depois):**
-   ```
-   django-insecure-$(openssl rand -hex 32)
-   ```
+   - **Environment:** ☑ Production ☑ Preview ☑ Development
 
 6. **Clique em "Deploy"**
 

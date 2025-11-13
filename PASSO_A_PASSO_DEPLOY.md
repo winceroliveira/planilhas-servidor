@@ -47,14 +47,37 @@ Clique em **"Environment Variables"** e adicione:
 #### Variável 1: SECRET_KEY
 ```
 Name: SECRET_KEY
-Value: [GERE UMA NOVA CHAVE - veja abaixo]
+Value: [GERE UMA NOVA CHAVE - veja opções abaixo]
 Environment: ☑ Production ☑ Preview ☑ Development
 ```
 
-**Para gerar SECRET_KEY:**
+**O que é SECRET_KEY?**
+É uma chave secreta do Django usada para criptografia e segurança. **NÃO compartilhe publicamente!**
+
+**Como gerar (escolha a opção mais fácil):**
+
+**Opção 1 - Online (mais fácil):**
+1. Acesse: https://djecrety.ir/
+2. Clique em "Generate"
+3. Copie a chave gerada
+
+**Opção 2 - Python:**
 ```bash
-python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+python -c "import secrets; print('django-insecure-' + secrets.token_urlsafe(50))"
 ```
+
+**Opção 3 - Se tiver Django instalado:**
+```bash
+cd servidor
+python manage.py shell -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+**Exemplo de chave gerada:**
+```
+django-insecure-7MGQqL-C3yQQxp2CWSiiVxPGhkQeKk8q5xA5mYFgTbseQrn5KYdO163b5zWnr0RIeK0
+```
+
+⚠️ **Use uma chave única para produção!**
 
 #### Variável 2: DEBUG
 ```
