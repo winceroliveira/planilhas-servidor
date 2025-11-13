@@ -6,12 +6,15 @@
 2. Repositório no GitHub já configurado
 3. Vercel CLI instalado (opcional, mas recomendado)
 
-## 🔧 Passo 1: Preparar o Projeto
+## 🔧 Passo 1: Preparar o Projeto Localmente
 
-### 1.1 Criar Migration (se ainda não fez)
+### 1.1 Criar Migration
+
+**IMPORTANTE:** Execute isso localmente antes do deploy:
 
 ```bash
 cd servidor
+# Ativar venv se necessário
 python manage.py makemigrations
 ```
 
@@ -24,6 +27,8 @@ git add chaves/migrations/
 git commit -m "Adicionar migration para ManusAITask"
 git push
 ```
+
+**Nota:** Se a migration já foi criada e commitada, pule este passo.
 
 ## 🌐 Passo 2: Deploy na Vercel
 
@@ -40,23 +45,41 @@ git push
 4. **Configure o projeto:**
    - **Framework Preset:** Other
    - **Root Directory:** `./` (deixe padrão)
-   - **Build Command:** Deixe vazio (Vercel detecta automaticamente)
+   - **Build Command:** `pip install -r requirements.txt && python manage.py migrate --noinput`
    - **Output Directory:** Deixe vazio
-   - **Install Command:** `pip install -r requirements.txt`
+   - **Install Command:** (deixe vazio, já está no build command)
 
 5. **Configure Variáveis de Ambiente:**
-   Clique em "Environment Variables" e adicione:
+   Clique em "Environment Variables" e adicione (uma por vez):
    
-   ```
-   SECRET_KEY = sua-chave-secreta-aqui (gere uma nova!)
-   DEBUG = False
-   ALLOWED_HOSTS = seu-projeto.vercel.app,seu-dominio.com
-   MANUS_AI_API_KEY = sk-6mrwm3G-9Y5Fbsguirsnbom066uPeJ4JX4aYGGVxc4IN9DdQ8uXRsBuCyjJfSxedvM_Nak3K3u310yOfstgBKcrDkDAf
-   ```
-
+   **Variável 1:**
+   - **Name:** `SECRET_KEY`
+   - **Value:** (gere uma nova chave - veja abaixo)
+   - **Environment:** Production, Preview, Development (marque todos)
+   
+   **Variável 2:**
+   - **Name:** `DEBUG`
+   - **Value:** `False`
+   - **Environment:** Production, Preview, Development
+   
+   **Variável 3:**
+   - **Name:** `ALLOWED_HOSTS`
+   - **Value:** `seu-projeto.vercel.app` (será preenchido após o primeiro deploy)
+   - **Environment:** Production, Preview, Development
+   
+   **Variável 4:**
+   - **Name:** `MANUS_AI_API_KEY`
+   - **Value:** `sk-6mrwm3G-9Y5Fbsguirsnbom066uPeJ4JX4aYGGVxc4IN9DdQ8uXRsBuCyjJfSxedvM_Nak3K3u310yOfstgBKcrDkDAf`
+   - **Environment:** Production, Preview, Development
+   
    **Para gerar uma nova SECRET_KEY:**
-   ```python
+   ```bash
    python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+   ```
+   
+   **OU use este valor temporário (substitua depois):**
+   ```
+   django-insecure-$(openssl rand -hex 32)
    ```
 
 6. **Clique em "Deploy"**
