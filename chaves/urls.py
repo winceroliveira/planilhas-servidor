@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import migrations_view
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -7,5 +8,7 @@ urlpatterns = [
     path('api/manus/webhook/', views.webhook_manus_ai, name='webhook_manus_ai'),
     path('api/manus/task/<str:task_id>/', views.verificar_task_manus, name='verificar_task_manus'),
     path('api/manus/registrar/', views.registrar_task_manus, name='registrar_task_manus'),
+    # ⚠️ TEMPORÁRIO: Remover após executar migrations
+    path('api/migrate/', migrations_view.executar_migrations, name='executar_migrations'),
 ]
 
