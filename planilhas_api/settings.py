@@ -165,7 +165,12 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # WhiteNoise configuration para servir arquivos estáticos na Vercel
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Usar storage simples para evitar problemas com manifest em serverless
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+# Configurações adicionais do WhiteNoise
+WHITENOISE_USE_FINDERS = True  # Permitir servir arquivos estáticos mesmo sem collectstatic
+WHITENOISE_AUTOREFRESH = True  # Recarregar arquivos automaticamente em desenvolvimento
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
