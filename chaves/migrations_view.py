@@ -35,21 +35,45 @@ def executar_migrations(request):
         }, status=500)
     
     try:
-        # Executar migrations
-        call_command('migrate', verbosity=0, interactive=False)
+        # Executar migrations com mais verbosidade para debug
+        from io import StringIO
+        import sys
+        
+        # Capturar output das migrations
+        output = StringIO()
+        old_stdout = sys.stdout
+        sys.stdout = output
+        
+        try:
+            call_command('migrate', verbosity=2, interactive=False)
+            migration_output = output.getvalue()
+        finally:
+            sys.stdout = old_stdout
         
         return JsonResponse({
             'status': 'success',
-            'message': 'Migrations executadas com sucesso!'
+            'message': 'Migrations executadas com sucesso!',
+            'output': migration_output.split('\n')[-10:] if migration_output else None
         })
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
         
-        return JsonResponse({
+        # Capturar mais informações sobre o erro
+        error_info = {
             'status': 'error',
             'message': str(e),
-            'details': error_details.split('\n')[-3] if error_details else None,
-            'help': 'Verifique os logs na Vercel para mais detalhes'
-        }, status=500)
+            'error_type': type(e).__name__,
+            'traceback': error_details.split('\n')[-10:] if error_details else None,
+        }
+        
+        # Verificar se é erro de conexão
+        if 'connection' in str(e).lower() or 'database' in str(e).lower():
+            error_info['help'] = 'Erro de conexão com banco de dados. Verifique se POSTGRES_URL está correta.'
+        elif 'no such table' in str(e).lower():
+            error_info['help'] = 'Tabelas não existem. As migrations precisam ser executadas.'
+        else:
+            error_info['help'] = 'Verifique os logs na Vercel para mais detalhes'
+        
+        return JsonResponse(error_info, status=500)
 
