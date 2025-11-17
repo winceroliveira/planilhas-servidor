@@ -96,9 +96,26 @@ database_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
 if database_url:
     # Produção: usar PostgreSQL ou outro banco via DATABASE_URL ou POSTGRES_URL
-    DATABASES = {
-        'default': dj_database_url.parse(database_url)
-    }
+    try:
+        DATABASES = {
+            'default': dj_database_url.parse(database_url)
+        }
+        # Configurações adicionais para PostgreSQL
+        DATABASES['default']['OPTIONS'] = {
+            'connect_timeout': 10,
+        }
+    except Exception as e:
+        # Se houver erro ao parsear a URL, usar SQLite como fallback
+        # Isso evita que o Django falhe completamente na inicialização
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f'Erro ao configurar PostgreSQL: {e}. Usando SQLite como fallback.')
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 else:
     # Desenvolvimento: usar SQLite
     DATABASES = {
