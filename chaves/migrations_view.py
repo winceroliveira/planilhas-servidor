@@ -2,10 +2,23 @@
 Endpoint temporário para executar migrations na Vercel
 ⚠️ REMOVER APÓS USAR - É UMA FALHA DE SEGURANÇA DEIXAR ATIVO!
 """
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.core.management import call_command
 import os
+import traceback
+import sys
+
+try:
+    from django.http import JsonResponse
+    from django.views.decorators.csrf import csrf_exempt
+    from django.core.management import call_command
+except ImportError as e:
+    # Se houver erro de importação, vamos criar uma função que retorna o erro
+    def executar_migrations(request):
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Erro ao importar módulos Django: {str(e)}',
+            'error_type': 'ImportError',
+            'help': 'Verifique se todas as dependências estão instaladas'
+        }, status=500)
 
 
 @csrf_exempt
@@ -34,10 +47,16 @@ def executar_migrations(request):
             'help': 'Veja servidor/PROXIMOS_PASSOS_SUPABASE.md para instruções'
         }, status=500)
     
+    # Informações de debug
+    debug_info = {
+        'postgres_url_exists': bool(os.environ.get('POSTGRES_URL')),
+        'database_url_exists': bool(os.environ.get('DATABASE_URL')),
+        'python_version': sys.version.split()[0],
+    }
+    
     try:
         # Executar migrations com mais verbosidade para debug
         from io import StringIO
-        import sys
         
         # Capturar output das migrations
         output = StringIO()
@@ -53,10 +72,10 @@ def executar_migrations(request):
         return JsonResponse({
             'status': 'success',
             'message': 'Migrations executadas com sucesso!',
-            'output': migration_output.split('\n')[-10:] if migration_output else None
+            'output': migration_output.split('\n')[-10:] if migration_output else None,
+            'debug': debug_info
         })
     except Exception as e:
-        import traceback
         error_details = traceback.format_exc()
         
         # Capturar mais informações sobre o erro
@@ -64,14 +83,18 @@ def executar_migrations(request):
             'status': 'error',
             'message': str(e),
             'error_type': type(e).__name__,
-            'traceback': error_details.split('\n')[-10:] if error_details else None,
+            'traceback': error_details.split('\n')[-15:] if error_details else None,
+            'debug': debug_info,
         }
         
         # Verificar se é erro de conexão
-        if 'connection' in str(e).lower() or 'database' in str(e).lower():
-            error_info['help'] = 'Erro de conexão com banco de dados. Verifique se POSTGRES_URL está correta.'
-        elif 'no such table' in str(e).lower():
+        error_str = str(e).lower()
+        if 'connection' in error_str or 'database' in error_str or 'psycopg' in error_str:
+            error_info['help'] = 'Erro de conexão com banco de dados. Verifique se POSTGRES_URL está correta e acessível.'
+        elif 'no such table' in error_str:
             error_info['help'] = 'Tabelas não existem. As migrations precisam ser executadas.'
+        elif 'import' in error_str:
+            error_info['help'] = 'Erro de importação. Verifique se todas as dependências estão instaladas.'
         else:
             error_info['help'] = 'Verifique os logs na Vercel para mais detalhes'
         
