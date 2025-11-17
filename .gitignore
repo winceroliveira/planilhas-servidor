@@ -12,4 +12,5 @@ db.sqlite3
 *.log
 .env
 .env.local
+staticfiles/
 
