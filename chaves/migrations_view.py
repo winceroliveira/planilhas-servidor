@@ -24,12 +24,13 @@ def executar_migrations(request):
     # if token != os.environ.get('MIGRATION_TOKEN', 'sua-chave-secreta-aqui'):
     #     return JsonResponse({'error': 'Unauthorized'}, status=401)
     
-    # Verificar se DATABASE_URL está configurada
-    if 'DATABASE_URL' not in os.environ:
+    # Verificar se DATABASE_URL ou POSTGRES_URL está configurada
+    database_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
+    if not database_url:
         return JsonResponse({
             'status': 'error',
-            'message': 'DATABASE_URL não configurada',
-            'details': 'Configure a variável de ambiente DATABASE_URL na Vercel (Settings → Environment Variables)',
+            'message': 'DATABASE_URL ou POSTGRES_URL não configurada',
+            'details': 'Configure a variável de ambiente DATABASE_URL ou POSTGRES_URL na Vercel (Settings → Environment Variables)',
             'help': 'Veja servidor/PROXIMOS_PASSOS_SUPABASE.md para instruções'
         }, status=500)
     

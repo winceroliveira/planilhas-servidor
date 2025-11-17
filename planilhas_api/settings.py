@@ -91,10 +91,13 @@ WSGI_APPLICATION = 'planilhas_api.wsgi.application'
 
 import dj_database_url
 
-if 'DATABASE_URL' in os.environ:
-    # Produção: usar PostgreSQL ou outro banco via DATABASE_URL
+# Aceitar DATABASE_URL ou POSTGRES_URL (Supabase fornece POSTGRES_URL)
+database_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
+
+if database_url:
+    # Produção: usar PostgreSQL ou outro banco via DATABASE_URL ou POSTGRES_URL
     DATABASES = {
-        'default': dj_database_url.parse(os.environ['DATABASE_URL'])
+        'default': dj_database_url.parse(database_url)
     }
 else:
     # Desenvolvimento: usar SQLite
