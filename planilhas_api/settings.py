@@ -174,3 +174,8 @@ CORS_ALLOW_ALL_ORIGINS = True  # Apenas para desenvolvimento!
 #     "http://localhost:8000",
 #     # Adicionar outras origens conforme necessário
 # ]
+
+# Admin Site Customization
+ADMIN_SITE_HEADER = "🔐 Sistema de Licenciamento"
+ADMIN_SITE_TITLE = "Admin - Planilhas"
+ADMIN_INDEX_TITLE = "Painel de Controle"
