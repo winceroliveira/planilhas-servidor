@@ -6,19 +6,9 @@ import os
 import traceback
 import sys
 
-try:
-    from django.http import JsonResponse
-    from django.views.decorators.csrf import csrf_exempt
-    from django.core.management import call_command
-except ImportError as e:
-    # Se houver erro de importação, vamos criar uma função que retorna o erro
-    def executar_migrations(request):
-        return JsonResponse({
-            'status': 'error',
-            'message': f'Erro ao importar módulos Django: {str(e)}',
-            'error_type': 'ImportError',
-            'help': 'Verifique se todas as dependências estão instaladas'
-        }, status=500)
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.management import call_command
 
 
 @csrf_exempt
